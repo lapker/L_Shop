@@ -11,3 +11,11 @@ export interface Cart {
     items: CartItem[];
     updatedAt: string;
 }
+
+export interface CartWithDetails {
+    userId: string;
+    items: (CartItem & { product: Product })[];
+    totalPrice: number;
+    totalItems: number;
+    updatedAt: string;
+}

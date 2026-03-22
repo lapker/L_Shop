@@ -1,6 +1,11 @@
 import { router } from './utils/router';
 import { authAPI } from './api/auth';
 import { cartAPI } from './api/cart';
+import { initMainPage } from './pages/MainPage';
+import { initAuthPage } from './pages/AuthPage';
+import { initCartPage } from './pages/CartPage';
+import { User } from './types';
+import './styles/main.css';
 
 export interface AppState {
     user: User | null;
@@ -74,14 +79,40 @@ async function initApp() {
     await updateState();
 
     router
-        .addRoute('/', () => '<h1>Главная страница (в разработке)</h1>', 'Главная')
-        .addRoute('/auth', () => '<h1>Страница авторизации (в разработке)</h1>', 'Вход / Регистрация')
-        .addRoute('/cart', () => '<h1>Корзина (в разработке)</h1>', 'Корзина')
+        .addRoute('/', async () => {
+            const { renderMainPage } = await import('./pages/MainPage');
+            const html = await renderMainPage();
+            setTimeout(() => initMainPage(), 50);
+            return html;
+        }, 'Главная')
+        .addRoute('/auth', async () => {
+            const { renderAuthPage } = await import('./pages/AuthPage');
+            const html = renderAuthPage();
+            setTimeout(() => initAuthPage(), 50);
+            return html;
+        }, 'Вход / Регистрация')
+        .addRoute('/cart', async () => {
+            const { renderCartPage } = await import('./pages/CartPage');
+            const html = await renderCartPage();
+            setTimeout(() => {
+                initCartPage();
+            }, 50);
+            return html;
+        }, 'Корзина')
         .addRoute('*', () => '<h1>404 - Страница не найдена</h1>');
 
     router.init();
 
-    await updateState();
+    document.getElementById('logout-btn')?.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+            await authAPI.logout();
+            await updateState();
+            router.navigate('/');
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', initApp);
