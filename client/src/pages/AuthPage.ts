@@ -29,7 +29,7 @@ export function renderAuthPage(): string {
                 ` : ''}
                 
                 <div class="form-group">
-                    <label for="login">Логин или Email</label>
+                    <label for="login">Логин</label>
                     <input type="text" id="login" name="login" required>
                 </div>
 
